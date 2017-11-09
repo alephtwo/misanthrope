@@ -4,6 +4,10 @@ import twitter4j.TwitterFactory
 
 fun main(args: Array<String>) {
     val twitter = TwitterFactory.getSingleton()
+    twitter.onRateLimitReached { e ->
+        Thread.sleep((e.rateLimitStatus.resetTimeInSeconds * 1000).toLong())
+    }
+
     val kevin = twitter.showUser("kevinbacon")
 
     blockTree(userId = kevin.id).forEach { twitter.createBlock(it) }
@@ -29,7 +33,7 @@ fun blockTree (userId: Long, depth: Int = 0, foundSoFar: Set<Long> = emptySet())
     val subtree = foundIncludingNow
         .minus(foundSoFar)
         .map({ blockTree(userId = it, depth = depth + 1, foundSoFar = foundIncludingNow) })
-        .flatMapTo(HashSet(), { b -> b })
+        .flatMapTo(HashSet(), { it })
 
     return foundSoFar.plus(subtree)
 }

@@ -32,7 +32,7 @@ fun blockTree (userId: Long, depth: Int = 0, foundSoFar: Set<Long> = emptySet())
     // Check if we found anything new and run the block tree over it
     val subtree = foundIncludingNow
         .minus(foundSoFar)
-        .map({ blockTree(userId = it, depth = depth + 1, foundSoFar = foundIncludingNow) })
+        .map { blockTree(userId = it, depth = depth + 1, foundSoFar = foundIncludingNow) }
         .flatMapTo(HashSet(), { it })
 
     return foundSoFar.plus(subtree)

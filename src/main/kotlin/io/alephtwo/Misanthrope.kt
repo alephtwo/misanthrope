@@ -12,7 +12,7 @@ fun main(args: Array<String>) {
     blockTree(userId = kevin.id).forEach { twitter.createBlock(it) }
 }
 
-fun blockTree (userId: Long, depth: Int = 0, foundSoFar: Set<Long> = emptySet()): Set<Long> {
+fun blockTree (userId: Long, depth: Int = 0, foundSoFar: Set<Long> = setOf(userId)): Set<Long> {
     // Only six degrees now
     if (depth > 5) {
         return emptySet()

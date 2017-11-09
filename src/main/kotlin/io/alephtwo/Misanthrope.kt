@@ -9,7 +9,6 @@ fun main(args: Array<String>) {
     }
 
     val kevin = twitter.showUser("kevinbacon")
-
     blockTree(userId = kevin.id).forEach { twitter.createBlock(it) }
 }
 

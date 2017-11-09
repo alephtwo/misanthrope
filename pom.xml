@@ -17,8 +17,13 @@
         <maven.compiler.source>${java.version}</maven.compiler.source>
         <maven.compiler.target>${java.version}</maven.compiler.target>
 
+        <app.main.class>io.alephtwo.MisanthropeKt</app.main.class>
         <junit.version>4.12</junit.version>
         <twitter4j.version>4.0.6</twitter4j.version>
+        <ktlint.version>0.11.1</ktlint.version>
+
+        <maven.shade.plugin.version>3.1.0</maven.shade.plugin.version>
+        <maven.antrun.plugin.version>1.7</maven.antrun.plugin.version>
     </properties>
 
     <dependencies>
@@ -51,6 +56,30 @@
 
         <plugins>
             <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-shade-plugin</artifactId>
+                <version>${maven.shade.plugin.version}</version>
+                <configuration>
+                    <transformers>
+                        <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+                            <manifestEntries>
+                                <Main-Class>${app.main.class}</Main-Class>
+                                <X-Compile-Source-JDK>${maven.compiler.source}</X-Compile-Source-JDK>
+                                <X-Compile-Target-JDK>${maven.compiler.target}</X-Compile-Target-JDK>
+                            </manifestEntries>
+                        </transformer>
+                    </transformers>
+                </configuration>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>shade</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
                 <groupId>org.jetbrains.kotlin</groupId>
                 <artifactId>kotlin-maven-plugin</artifactId>
                 <version>${kotlin.version}</version>
@@ -74,15 +103,20 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-antrun-plugin</artifactId>
-                <version>1.7</version>
+                <version>${maven.antrun.plugin.version}</version>
                 <executions>
                     <execution>
                         <id>ktlint</id>
                         <phase>verify</phase>
                         <configuration>
                             <target name="ktlint">
-                                <java taskname="ktlint" dir="${basedir}" fork="true" failonerror="true"
-                                      classname="com.github.shyiko.ktlint.Main" classpathref="maven.plugin.classpath">
+                                <java
+                                    taskname="ktlint"
+                                    dir="${basedir}"
+                                    fork="true"
+                                    failonerror="true"
+                                    classname="com.github.shyiko.ktlint.Main"
+                                    classpathref="maven.plugin.classpath">
                                     <arg value="src/**/*.kt"/>
                                 </java>
                             </target>
@@ -112,7 +146,7 @@
                     <dependency>
                         <groupId>com.github.shyiko</groupId>
                         <artifactId>ktlint</artifactId>
-                        <version>0.11.1</version>
+                        <version>${ktlint.version}</version>
                     </dependency>
                 </dependencies>
             </plugin>

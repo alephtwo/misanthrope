@@ -1,11 +1,14 @@
 package io.alephtwo
 
 import twitter4j.TwitterFactory
+import java.time.Instant
 
 fun main(args: Array<String>) {
     val twitter = TwitterFactory.getSingleton()
     twitter.onRateLimitReached { e ->
-        Thread.sleep((e.rateLimitStatus.resetTimeInSeconds * 1000).toLong())
+        val resetsAt = e.rateLimitStatus.resetTimeInSeconds.toLong()
+        val now = Instant.now().epochSecond
+        Thread.sleep((resetsAt - now) * 1000)
     }
 
     val kevin = twitter.showUser("kevinbacon")
@@ -20,13 +23,15 @@ fun blockTree (userId: Long, depth: Int = 0, foundSoFar: Set<Long> = setOf(userI
 
     // Get the followers of this user
     val twitter = TwitterFactory.getSingleton()
-    val followerIds = twitter.getFollowersIDs(userId)
 
     // Aggregate the IDs that we have just found
     var foundIncludingNow: Set<Long> = HashSet(foundSoFar)
-    while (followerIds.hasNext()) {
+
+    var followerIds = twitter.getFollowersIDs(userId, -1)
+    do {
         foundIncludingNow = foundIncludingNow.plus(followerIds.iDs.asIterable())
-    }
+        followerIds = twitter.getFollowersIDs(userId, followerIds.nextCursor)
+    } while (followerIds.hasNext())
 
     // Check if we found anything new and run the block tree over it
     val subtree = foundIncludingNow
